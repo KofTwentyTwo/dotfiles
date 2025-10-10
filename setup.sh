@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-REPO_URL="${1:-git@github.com:YOURUSER/dotfiles.git}"
+REPO_URL="${1:-git@github.com:KofTwentyTwo/dotfiles.git}"
 DOTFILES_DIR="$HOME/.dotfiles"
 ALIAS_CMD="alias dot='git --git-dir=$DOTFILES_DIR/ --work-tree=$HOME'"
 
