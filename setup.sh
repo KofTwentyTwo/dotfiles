@@ -1,41 +1,56 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
 REPO_URL="${1:-git@github.com:KofTwentyTwo/dotfiles.git}"
 DOTFILES_DIR="$HOME/.dotfiles"
-ALIAS_CMD="alias dot='git --git-dir=$DOTFILES_DIR/ --work-tree=$HOME'"
+BACKUP_DIR="$HOME/.dotfiles-backup"
 
 echo "Setting up dotfiles from $REPO_URL"
 
-# 1. Clone the bare repository
+# 1. Clone or verify existing bare repo
 if [ -d "$DOTFILES_DIR" ]; then
   echo "Dotfiles repo already exists at $DOTFILES_DIR"
 else
   git clone --bare "$REPO_URL" "$DOTFILES_DIR"
 fi
 
-# 2. Define temporary alias for this session
-eval "$ALIAS_CMD"
+# 2. Define local helper function
+dot() {
+  git --git-dir="$DOTFILES_DIR/" --work-tree="$HOME" "$@"
+}
 
-# 3. Backup any existing conflicting files
+# 3. Backup any conflicting files before checkout
 echo "Backing up any pre-existing dotfiles..."
-mkdir -p ~/.dotfiles-backup
-dot checkout 2>&1 | grep -E "^\s" | awk '{print $1}' | while read -r file; do
-  mkdir -p "$(dirname ~/.dotfiles-backup/$file)"
-  mv "$HOME/$file" ~/.dotfiles-backup/$file || true
-done
+mkdir -p "$BACKUP_DIR"
+if ! dot checkout 2>/dev/null; then
+  echo "Backing up conflicting files to $BACKUP_DIR"
+  dot checkout 2>&1 | grep -E "^\s" | awk '{print $1}' | while read -r file; do
+    mkdir -p "$(dirname "$BACKUP_DIR/$file")"
+    mv "$HOME/$file" "$BACKUP_DIR/$file" 2>/dev/null || true
+  done
+  dot checkout
+fi
 
-# 4. Check out the tracked files
-dot checkout
-
-# 5. Configure Git to hide untracked files in status
+# 4. Hide untracked files from git status
 dot config status.showUntrackedFiles no
 
-# 6. Persist the alias for future shells
-if ! grep -q "alias dot=" ~/.zshrc 2>/dev/null && ! grep -q "alias dot=" ~/.bashrc 2>/dev/null; then
-  echo "$ALIAS_CMD" >> ~/.zshrc
-  echo "$ALIAS_CMD" >> ~/.bashrc
-fi
+# 5. Persist function definition in user shells
+persist_function() {
+  local rc_file="$1"
+  if ! grep -q "dot()" "$rc_file" 2>/dev/null; then
+    cat <<'EOF' >> "$rc_file"
+
+# Dotfiles management helper
+dot() {
+  git --git-dir="$HOME/.dotfiles/" --work-tree="$HOME" "$@"
+}
+EOF
+  fi
+}
+
+persist_function "$HOME/.zshrc"
+persist_function "$HOME/.bashrc"
 
 echo "Dotfiles setup complete."
 echo "Use 'dot status' and 'dot pull' to manage your configs."
+
