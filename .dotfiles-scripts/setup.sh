@@ -54,3 +54,13 @@ persist_function "$HOME/.bashrc"
 echo "Dotfiles setup complete."
 echo "Use 'dot status' and 'dot pull' to manage your configs."
 
+# 6. Run local development environment setup
+echo ""
+echo "Setting up local development environment..."
+if [ -f "$HOME/.dotfiles-scripts/setup-local.sh" ]; then
+    bash "$HOME/.dotfiles-scripts/setup-local.sh"
+else
+    echo "Local setup script not found. You can run it manually later:"
+    echo "  ./setup local"
+fi
+

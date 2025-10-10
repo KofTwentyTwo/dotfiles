@@ -4,30 +4,30 @@ Personal configuration files managed with a bare git repository.
 
 ## Quick Setup
 
-### 1. Dotfiles Setup
+### One-Command Setup
 ```bash
-# Clone and setup
+# Complete setup: dotfiles + local dev environment (macOS/Ubuntu/Arch)
+curl -fsSL https://raw.githubusercontent.com/KofTwentyTwo/dotfiles/main/.dotfiles-scripts/setup.sh | bash
+```
+
+### Manual Setup (if needed)
+```bash
+# Clone and setup dotfiles only
 git clone --bare git@github.com:KofTwentyTwo/dotfiles.git ~/.dotfiles
 alias dot='git --git-dir=~/.dotfiles/ --work-tree=~'
 dot checkout
 dot config status.showUntrackedFiles no
 
-# Or use the setup script
-curl -fsSL https://raw.githubusercontent.com/KofTwentyTwo/dotfiles/main/.dotfiles-scripts/setup.sh | bash
-```
-
-### 2. Local Development Environment
-```bash
-# Install zsh, oh-my-zsh, and dev packages (macOS/Ubuntu/Arch)
+# Then run local setup
 curl -fsSL https://raw.githubusercontent.com/KofTwentyTwo/dotfiles/main/.dotfiles-scripts/setup-local.sh | bash
 ```
 
-### 3. Using the Launcher (after dotfiles setup)
+### Using the Launcher (after dotfiles setup)
 ```bash
-# Setup dotfiles
+# Setup dotfiles only
 ./setup dotfiles
 
-# Setup local environment
+# Setup local environment only
 ./setup local
 
 # Show help
