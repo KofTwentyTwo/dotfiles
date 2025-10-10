@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Dotfiles setup launcher
+
+SCRIPT_DIR="$HOME/.dotfiles-scripts"
+
+case "${1:-help}" in
+    "dotfiles"|"1")
+        echo "Running dotfiles setup..."
+        bash "$SCRIPT_DIR/setup.sh" "${@:2}"
+        ;;
+    "local"|"2")
+        echo "Running local development environment setup..."
+        bash "$SCRIPT_DIR/setup-local.sh" "${@:2}"
+        ;;
+    "help"|"-h"|"--help")
+        echo "Dotfiles Setup Launcher"
+        echo ""
+        echo "Usage: $0 [command] [options]"
+        echo ""
+        echo "Commands:"
+        echo "  dotfiles, 1    Setup dotfiles repository"
+        echo "  local, 2       Setup local development environment (zsh, oh-my-zsh, packages)"
+        echo "  help, -h       Show this help message"
+        echo ""
+        echo "Examples:"
+        echo "  $0 dotfiles    # Setup dotfiles"
+        echo "  $0 local       # Setup local environment"
+        echo "  $0 1           # Setup dotfiles (short form)"
+        echo "  $0 2           # Setup local environment (short form)"
+        ;;
+    *)
+        echo "Unknown command: $1"
+        echo "Run '$0 help' for usage information"
+        exit 1
+        ;;
+esac
